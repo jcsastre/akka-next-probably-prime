@@ -14,6 +14,6 @@ public class PrimeGenerator implements Runnable {
     @Override
     public void run() {
         BigInteger bigInteger = new BigInteger(2500, new Random());
-        results.getPrimes().add(bigInteger.nextProbablePrime());
+        results.addPrime(bigInteger.nextProbablePrime());
     }
 }

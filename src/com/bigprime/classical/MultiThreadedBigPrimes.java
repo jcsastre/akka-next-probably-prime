@@ -10,11 +10,16 @@ public class MultiThreadedBigPrimes {
         final long start = System.currentTimeMillis();
 
         Results results = new Results();
+
+        final CurrentStatus status = new CurrentStatus(results);
+        final Thread statusTask = new Thread(status);
+        statusTask.start();
+
         Runnable task = new PrimeGenerator(results);
 
         List<Thread> threads = new ArrayList<>();
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 100; i++) {
             final Thread t = new Thread(task);
             threads.add(t);
             t.start();
