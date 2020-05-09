@@ -32,21 +32,32 @@ public class WorkerBehavior extends AbstractBehavior<WorkerBehavior.Command> {
         return Behaviors.setup(WorkerBehavior::new);
     }
 
-    private BigInteger prime;
-
     @Override
     public Receive<WorkerBehavior.Command> createReceive() {
+        return handleMessagesWhenDontYetHaveAPrimeNumber();
+    }
+
+    public Receive<WorkerBehavior.Command> handleMessagesWhenDontYetHaveAPrimeNumber() {
+
         return newReceiveBuilder()
                 .onAnyMessage(command -> {
-                    if (command.getMessage().equals("start")) {
-                        if (prime == null) {
-                            final BigInteger bigInteger = new BigInteger(2000, new Random());
-                            prime = bigInteger.nextProbablePrime();
-                        }
-                        final ManagerBehavior.ResultCommand resultCommand = new ManagerBehavior.ResultCommand(prime);
-                        command.getSender().tell(resultCommand);
-                    }
-                    return this;
+                    BigInteger prime;
+                    final BigInteger bigInteger = new BigInteger(2000, new Random());
+                    prime = bigInteger.nextProbablePrime();
+                    final ManagerBehavior.ResultCommand resultCommand = new ManagerBehavior.ResultCommand(prime);
+                    command.getSender().tell(resultCommand);
+                    return handleMessagesWhenAlreadyHaveAPrimeNumber(prime);
+                })
+                .build();
+    }
+
+    public Receive<WorkerBehavior.Command> handleMessagesWhenAlreadyHaveAPrimeNumber(BigInteger prime) {
+
+        return newReceiveBuilder()
+                .onAnyMessage(command -> {
+                    final ManagerBehavior.ResultCommand resultCommand = new ManagerBehavior.ResultCommand(prime);
+                    command.getSender().tell(resultCommand);
+                    return Behaviors.same();
                 })
                 .build();
     }
